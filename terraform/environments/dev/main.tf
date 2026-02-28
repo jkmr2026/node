@@ -2,9 +2,16 @@ provider "aws" {
   region = var.aws_region
 }
 
+module "vpc" {
+  source   = "../../modules/vpc"
+  env_name = var.env_name
+  vpc_cidr = var.vpc_cidr
+  tags     = var.default_tags
+}
+
 module "eks_deploy" {
   source        = "../../modules/eks_cluster"
-  vpc_id             = var.vpc_id
+  vpc_id             = module.vpc.vpc_id
   env_name           = var.env_name
   desired_nodes      = var.desired_nodes
   max_nodes          = var.max_nodes
@@ -14,7 +21,7 @@ module "eks_deploy" {
 module "private_subnets" {
   source = "../../modules/subnets"
 
-  vpc_id               = var.vpc_id
+  vpc_id               = module.vpc.vpc_id
   env_name             = var.env_name
   availability_zones   = var.availability_zones
   private_subnet_cidrs = var.private_subnet_cidrs
@@ -23,7 +30,7 @@ module "private_subnets" {
 
 # Define these locally so they can be fed into the module
 variable "aws_region"        {}
-variable "vpc_id"            {}
+variable "vpc_cidr"          {}
 variable "env_name"          {}
 variable "desired_nodes"     {}
 variable "max_nodes"         {}
