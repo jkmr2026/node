@@ -18,7 +18,6 @@ default_tags = {
 
 # Control KMS and log group creation/override
 create_kms_key             = true
-existing_kms_key_arn       = null
 create_cloudwatch_log_group = true
 kms_key_alias              = "alias/eks/dev-eks-new"
 

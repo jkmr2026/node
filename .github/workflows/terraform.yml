@@ -87,3 +87,7 @@ jobs:
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform -chdir=terraform/environments/dev apply -auto-approve -input=false -var-file=terraform.tfvars
+
+      - name: Terraform Destroy on Failure
+        if: failure()
+        run: terraform -chdir=terraform/environments/dev destroy -auto-approve -input=false -var-file=terraform.tfvars
