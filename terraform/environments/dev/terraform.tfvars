@@ -6,8 +6,8 @@ max_nodes     = 2
 
 availability_zones = ["ap-south-1a", "ap-south-1b"]
 private_subnet_cidrs = [
-  "10.0.1.0/24",
-  "10.0.2.0/24"
+  "172.31.0.0/20",
+  "172.31.16.0/20"
 ]
 
 default_tags = {
