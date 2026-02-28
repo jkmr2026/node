@@ -50,3 +50,4 @@ variable "create_kms_key"          { default = true }
 variable "existing_kms_key_arn"    { default = null }
 variable "create_cloudwatch_log_group" { default = true }
 variable "cloudwatch_log_group_name"   { default = "" }
+variable "enable_conflict_cleanup"      { default = true }

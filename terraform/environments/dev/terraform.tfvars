@@ -21,3 +21,6 @@ create_kms_key             = true
 existing_kms_key_arn       = null
 create_cloudwatch_log_group = true
 kms_key_alias              = "alias/eks/dev-eks-new"
+
+# Enable pre-flight cleanup of conflicting KMS alias/log group
+enable_conflict_cleanup = true
