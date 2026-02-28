@@ -66,6 +66,9 @@ jobs:
           role-to-assume: arn:aws:iam::221789841520:role/github-oidc # Paste your Role ARN here
           aws-region: ap-south-1 # Change to your target region
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Test AWS Authentication
         run: |
           # If this command succeeds, your OIDC connection is working perfectly!
