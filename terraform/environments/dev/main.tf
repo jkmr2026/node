@@ -20,9 +20,10 @@ module "eks_deploy" {
   # Optional overrides to avoid name collisions
   cluster_name               = "${var.env_name}-eks-${var.name_suffix}"
   create_kms_key             = var.create_kms_key
+  kms_key_alias              = "alias/eks/${var.env_name}-eks-${var.name_suffix}"
   existing_kms_key_arn       = var.existing_kms_key_arn
   create_cloudwatch_log_group = var.create_cloudwatch_log_group
-  cloudwatch_log_group_name   = var.cloudwatch_log_group_name
+  # cloudwatch_log_group_name unsupported in module v20; leaving flag only
 }
 
 module "private_subnets" {

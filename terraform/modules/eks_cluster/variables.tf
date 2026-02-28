@@ -16,6 +16,12 @@ variable "create_kms_key" {
   default     = true
 }
 
+variable "kms_key_alias" {
+  description = "Optional alias for the KMS key when create_kms_key is true"
+  type        = string
+  default     = ""
+}
+
 variable "existing_kms_key_arn" {
   description = "Use an existing KMS key ARN when create_kms_key is false"
   type        = string
@@ -26,10 +32,4 @@ variable "create_cloudwatch_log_group" {
   description = "Whether to create the CloudWatch Log Group for control plane logs"
   type        = bool
   default     = true
-}
-
-variable "cloudwatch_log_group_name" {
-  description = "Optional override for the CloudWatch log group name"
-  type        = string
-  default     = ""
 }

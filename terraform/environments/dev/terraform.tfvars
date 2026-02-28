@@ -20,4 +20,4 @@ default_tags = {
 create_kms_key             = true
 existing_kms_key_arn       = null
 create_cloudwatch_log_group = true
-cloudwatch_log_group_name   = "/aws/eks/dev-eks-new/cluster"
+kms_key_alias              = "alias/eks/dev-eks-new"

@@ -16,14 +16,15 @@ module "eks" {
   # Mandatory for small instances
   cluster_endpoint_public_access = true
 
-  # Handle KMS key creation/override to avoid alias conflicts
-  create_kms_key   = var.create_kms_key
-  kms_key_arn      = var.create_kms_key ? null : var.existing_kms_key_arn
+  # KMS handling: use alias override when creating, or supply existing key ARN
+  create_kms_key          = var.create_kms_key
+  kms_key_arn             = var.create_kms_key ? null : var.existing_kms_key_arn
+  kms_key_deletion_window = 7
+  kms_key_aliases         = var.create_kms_key && var.kms_key_alias != "" ? [var.kms_key_alias] : []
   enable_kms_key_rotation = var.create_kms_key
 
-  # Handle CloudWatch log group creation override to avoid name conflicts
+  # CloudWatch log group: only created when flag is true
   create_cloudwatch_log_group = var.create_cloudwatch_log_group
-  cloudwatch_log_group_name   = var.cloudwatch_log_group_name != "" ? var.cloudwatch_log_group_name : null
 
   eks_managed_node_groups = {
     minimal = {
