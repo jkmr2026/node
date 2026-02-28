@@ -26,6 +26,7 @@ jobs:
         run: |
           # If this command succeeds, your OIDC connection is working perfectly!
           aws sts get-caller-identity
+          aws ec2 describe-instances --filters "Name=instance-state-name,Values=running"
           
       # Add your actual deployment steps here (e.g., push to ECR, update Lambda, S3 sync)
       # - name: Sync to S3
