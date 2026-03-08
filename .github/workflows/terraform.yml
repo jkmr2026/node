@@ -91,3 +91,7 @@ jobs:
       - name: Terraform Destroy on Failure
         if: failure()
         run: terraform -chdir=terraform/environments/dev destroy -auto-approve -input=false -var-file=terraform.tfvars
+
+      - name: Terraform Destroy (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        run: terraform -chdir=terraform/environments/dev destroy -auto-approve -input=false -var-file=terraform.tfvars
