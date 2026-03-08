@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: grafana
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: grafana
+    targetRevision: 8.*
+    helm:
+      releaseName: grafana
+      values: |
+        service:
+          type: ClusterIP
+        ingress:
+          enabled: false
+        persistence:
+          enabled: false
+        adminUser: admin
+        adminPassword: "admin123" # change in secret manager or via override
+        serviceAccount:
+          create: true
+          name: grafana
+        rbac:
+          pspEnabled: false
