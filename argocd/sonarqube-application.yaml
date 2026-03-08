@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarqube
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sonar
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://SonarSource.github.io/helm-chart-sonarqube
+    chart: sonarqube
+    targetRevision: 10.*
+    helm:
+      releaseName: sonarqube
+      values: |
+        sonarProperties:
+          sonar.forceAuthentication: true
+        service:
+          type: LoadBalancer
+        persistence:
+          enabled: true
+          size: 10Gi
+        postgresql:
+          enabled: true
+          persistence:
+            enabled: true
+            size: 10Gi
+        sonarSecretProperties:
+          sonar.password: "ChangeMe123"

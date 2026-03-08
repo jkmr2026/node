@@ -42,6 +42,29 @@ jobs:
           push: true
           tags: myuser/hello:latest
 
+      - name: Install SonarScanner
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip
+          SCANNER_VERSION=5.0.1.3006
+          curl -sLo /tmp/sonar.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SCANNER_VERSION}-linux.zip"
+          unzip /tmp/sonar.zip -d $HOME
+          echo "SONAR_SCANNER_HOME=$HOME/sonar-scanner-${SCANNER_VERSION}-linux" >> $GITHUB_ENV
+          echo "$HOME/sonar-scanner-${SCANNER_VERSION}-linux/bin" >> $GITHUB_PATH
+
+      - name: SonarQube Scan
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [ -z "$SONAR_HOST_URL" ] || [ -z "$SONAR_TOKEN" ]; then
+            echo "Sonar credentials not provided; skipping scan." && exit 0
+          fi
+          sonar-scanner \
+            -Dsonar.projectKey=hello-app \
+            -Dsonar.sources=. \
+            -Dsonar.host.url="$SONAR_HOST_URL" \
+            -Dsonar.login="$SONAR_TOKEN"
+
       - name: Configure kubectl (EKS)
         env:
           CLUSTER_NAME: dev-eks-new
