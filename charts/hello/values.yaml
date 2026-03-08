@@ -1,0 +1,17 @@
+image:
+  repository: myuser/hello
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+
+podAnnotations: {}
+
+prometheus:
+  enabled: true
+  path: /metrics
+  port: 9113
