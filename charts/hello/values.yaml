@@ -1,7 +1,7 @@
 image:
   repository: myuser/hello
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: ClusterIP

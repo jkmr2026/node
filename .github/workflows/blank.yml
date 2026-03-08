@@ -3,6 +3,7 @@ name: AWS OIDC Deployment
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 # MUST HAVE THIS PERMISSION BLOCK
 permissions:
@@ -16,21 +17,50 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::221789841520:role/github-oidc # Paste your Role ARN here
           aws-region: ap-south-1 # Change to your target region
 
-      - name: Test AWS Authentication
+      - name: Log caller identity
+        run: aws sts get-caller-identity
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker Hub login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image (myuser/hello:latest)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: myuser/hello:latest
+
+      - name: Configure kubectl (EKS)
+        env:
+          CLUSTER_NAME: dev-eks-new
+          AWS_REGION: ap-south-1
+        run: aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION"
+
+      - name: Sync Argo CD applications
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+          ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
         run: |
-          # If this command succeeds, your OIDC connection is working perfectly!
-          aws sts get-caller-identity
-          aws ec2 describe-instances \
-            --filters "Name=instance-state-name,Values=running" \
-            --query "Reservations[*].Instances[*].[InstanceId, InstanceType, PublicIpAddress]" \
-            --output table
-          
-      # Add your actual deployment steps here (e.g., push to ECR, update Lambda, S3 sync)
-      # - name: Sync to S3
-      #   run: aws s3 sync ./build s3://my-frontend-bucket
+          if [ -z "$ARGOCD_SERVER" ] || [ -z "$ARGOCD_USERNAME" ] || [ -z "$ARGOCD_PASSWORD" ]; then
+            echo "Argo CD creds not provided; skipping sync." && exit 0
+          fi
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd
+          ./argocd login "$ARGOCD_SERVER" --username "$ARGOCD_USERNAME" --password "$ARGOCD_PASSWORD" --insecure
+          ./argocd app sync monitoring || true
+          ./argocd app sync loki-promtail || true
+          ./argocd app sync grafana || true
+          ./argocd app sync hello || true
